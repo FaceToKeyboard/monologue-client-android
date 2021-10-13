@@ -1,0 +1,7 @@
+{
+  "name": "monologue-android",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
