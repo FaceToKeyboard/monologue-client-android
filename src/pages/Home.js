@@ -3,7 +3,7 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/rea
 import Message from '../components/Message.jsx';
 import './Home.css';
 import axios from 'axios';
-import { createAlarm } from '@facetokeyboard/android-alarmclock';
+import { AndroidAlarmIntent } from '@facetokeyboard/android-alarmclock';
 
 const Home = () => {
   const messageData = {};
@@ -48,7 +48,12 @@ const Home = () => {
   }
 
   const alarmCreateHandler = () => {
-    createAlarm(7, 50, 'This alarm is from Monologue!');
+    const settings = {
+      hour: 7,
+      minute: 50,
+      message: 'This alarm is from Monologue!',
+    }
+    AndroidAlarmIntent.createAlarm(settings);
   }
 
   return (
