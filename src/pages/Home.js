@@ -4,6 +4,7 @@ import Message from '../components/Message.jsx';
 import './Home.css';
 import axios from 'axios';
 import { AndroidAlarmIntent } from '@facetokeyboard/android-alarmclock';
+import useRecursiveTimeout from '../useRecursiveTimeout.ts';
 
 const Home = () => {
   const messageData = {};
@@ -15,6 +16,11 @@ const Home = () => {
     baseURL: 'http://10.0.12.45:3000',
     timeout: 2000,
   });
+  const commandConfirm = {
+      userId,
+      messageType: 'text',
+      messageContent: 'Command confirmed',
+    };
 
   const getMessages = (userId) => {
     queryString.set('userId', userId);
@@ -32,6 +38,10 @@ const Home = () => {
       .then(({data}) => {
         if (data !== undefined) {
           setMessages(data);
+          const latestMsg = data[data.length - 1].messageContent;
+          if (latestMsg[0] === '/') {
+            commandHandler(latestMsg);
+          }
         }
       })
       .catch(err => console.log('Error mapping messages: ', err));
@@ -41,11 +51,28 @@ const Home = () => {
     getMessages(userId);
   }, [userId])
 
+  useRecursiveTimeout(() => {
+    getMessages(userId);
+  }, 6000);
+
+  const commandHandler = (msg) => {
+    console.log('handling command: ', msg);
+    const params = msg.split(' ');
+    const first = params.shift();
+    if (first === '/alarm') {
+      alarmCreateHandler(params.shift(), params.shift(), params.join(' '));
+    }
+    if (first === '/timer') {
+      timerCreateHandler(params.shift(), params.join(' '));
+    }
+
+  };
+
   const messageChangeHandler = (e) => {
     setMessage(e.target.value);
   };
 
-  const sendButtonHandler = (e) => {
+  const messageSendHandler = (e) => {
     e.preventDefault();
     messageData.userId = userId;
     messageData.messageType = 'text';
@@ -53,24 +80,38 @@ const Home = () => {
 
     httpRequest.post('/messages', messageData)
       .catch(err => console.log('Error submitting message: ', err))
-      .then(() => getMessages(userId));
+      .then(() => {
+        getMessages(userId);
+        setMessage('');
+      });
   };
 
   const userIdChangeHandler = (e) => {
     setUserId(e.target.value);
   }
 
-  const alarmCreateHandler = () => {
+  const alarmCreateHandler = (hour, minute, message) => {
     const settings = {
-      hour: 7,
-      minute: 50,
-      message: 'This alarm is from Monologue!',
+      hour: parseInt(hour),
+      minute: parseInt(minute),
+      message,
     }
-    AndroidAlarmIntent.createAlarm(settings);
+    AndroidAlarmIntent.createAlarm(settings)
+      .then(() => httpRequest.post('/messages', commandConfirm))
+      .catch(err => console.log('command confirm error: ', err))
+      .then(() => getMessages(userId));
   }
 
-  const timerCreateHandler = () => {
-    AndroidAlarmIntent.createTimer({duration: 10, message: 'This was created by Monologue!'});
+  const timerCreateHandler = (duration, message) => {
+    const options = {
+      duration: parseInt(duration),
+      message,
+    }
+    console.log('timer options: ', options);
+    AndroidAlarmIntent.createTimer(options)
+      .then(() => httpRequest.post('/messages', commandConfirm))
+      .catch(err => console.log('command confirm error: ', err))
+      .then(() => getMessages(userId));
   }
 
   return (
@@ -100,15 +141,10 @@ const Home = () => {
           <label>Message:
             <input id='input-message' name='message-input' type='text' placeholder='Send a message' value={message} onChange={messageChangeHandler} ></input>
           </label>
-          <button id='button-send' type='submit' onClick={sendButtonHandler} >Send</button>
+          <br></br>
+          <br></br>
+          <button id='button-send' type='submit' onClick={messageSendHandler} >Send</button>
         </form>
-        <br></br>
-        <button onClick={alarmCreateHandler} >Create an alarm?</button>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-        <button onClick={timerCreateHandler} >Create a timer?</button>
       </IonContent>
     </IonPage>
   );
