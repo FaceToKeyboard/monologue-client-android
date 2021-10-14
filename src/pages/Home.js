@@ -127,9 +127,10 @@ const Home = () => {
             <IonTitle size="large">Monologue</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <label>Enter user ID:
+        <label>Enter user ID:<br></br>
           <input name='input-userid' type='number' value={userId} onChange={userIdChangeHandler} ></input>
         </label>
+        <br></br>
         <br></br>
         <div id='message-container'>
           {messages.map((message) => (
@@ -139,6 +140,7 @@ const Home = () => {
         <br></br>
         <form>
           <label>Message:
+            <br></br>
             <input id='input-message' name='message-input' type='text' placeholder='Send a message' value={message} onChange={messageChangeHandler} ></input>
           </label>
           <br></br>
