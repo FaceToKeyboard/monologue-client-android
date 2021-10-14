@@ -3,11 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@capacitor/android": "3.2.5",
     "@capacitor/app": "1.0.3",
     "@capacitor/core": "3.2.4",
     "@capacitor/haptics": "1.1.0",
     "@capacitor/keyboard": "1.1.0",
     "@capacitor/status-bar": "1.0.3",
+    "@facetokeyboard/android-alarmclock": "file:../capacitor-plugin-alarmclock/android-alarmclock",
     "@ionic/react": "^5.5.0",
     "@ionic/react-router": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.9",
