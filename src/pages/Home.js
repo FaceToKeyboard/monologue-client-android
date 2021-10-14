@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonFooter } from '@ionic/react';
 import Message from '../components/Message.jsx';
 import './Home.css';
 import axios from 'axios';
 import { AndroidAlarmIntent } from '@facetokeyboard/android-alarmclock';
 import useRecursiveTimeout from '../useRecursiveTimeout.ts';
+import { Capacitor } from '@capacitor/core';
+
+const alarmAvailable = Capacitor.isPluginAvailable('AndroidAlarmIntent');
 
 const Home = () => {
   const messageData = {};
@@ -59,11 +62,13 @@ const Home = () => {
     console.log('handling command: ', msg);
     const params = msg.split(' ');
     const first = params.shift();
-    if (first === '/alarm') {
+    if (first === '/alarm' && alarmAvailable) {
       alarmCreateHandler(params.shift(), params.shift(), params.join(' '));
+      console.log('alarm handler called');
     }
-    if (first === '/timer') {
+    if (first === '/timer' && alarmAvailable) {
       timerCreateHandler(params.shift(), params.join(' '));
+      console.log('timer handler called');
     }
 
   };
@@ -136,17 +141,22 @@ const Home = () => {
           {messages.map((message) => (
             <Message key={message._id.slice(message.length-7)} message={message} />
           ))}
+          <div id='scroll-anchor'></div>
         </div>
         <br></br>
-        <form>
-          <label>Message:
-            <br></br>
-            <input id='input-message' name='message-input' type='text' placeholder='Send a message' value={message} onChange={messageChangeHandler} ></input>
-          </label>
-          <br></br>
-          <br></br>
-          <button id='button-send' type='submit' onClick={messageSendHandler} >Send</button>
-        </form>
+        <IonFooter>
+          <div id='message-form-container'>
+            <form>
+              <label>Message:
+                <br></br>
+                <input id='input-message' name='message-input' type='text' placeholder='Send a message' value={message} onChange={messageChangeHandler} ></input>
+              </label>
+              <br></br>
+              <br></br>
+              <button id='button-send' type='submit' onClick={messageSendHandler} >Send</button>
+            </form>
+          </div>
+        </IonFooter>
       </IonContent>
     </IonPage>
   );

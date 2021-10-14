@@ -8,13 +8,29 @@ button {
 }
 
 #message-container {
-  max-height: 80%;
+  max-height: 55vh;
   overflow-y: scroll;
   border-style: solid;
   border-width: 2px;
   border-color: var(--ion-color-secondary);
+
+  /* don't allow the children of the scrollable element to be selected as an anchor node */
+  overflow-anchor: none;
 }
 
 input {
   margin: 1rem;
 }
+
+#scroll-anchor {
+  /* allow the final child to be selected as an anchor node */
+  overflow-anchor: auto;
+
+  /* anchor nodes are required to have non-zero area */
+  height: 1px;
+}
+/* 
+#mesage-form-container {
+  height: 15%;
+}
+ */
