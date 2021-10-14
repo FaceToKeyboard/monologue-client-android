@@ -3,6 +3,7 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/rea
 import Message from '../components/Message.jsx';
 import './Home.css';
 import axios from 'axios';
+import { createAlarm } from '@facetokeyboard/android-alarmclock';
 
 const Home = () => {
   const messageData = {};
@@ -31,7 +32,7 @@ const Home = () => {
     setMessage(e.target.value);
   };
 
-  const SendButtonHandler = (e) => {
+  const sendButtonHandler = (e) => {
     e.preventDefault();
     messageData.userId = userId;
     messageData.messageType = 'text';
@@ -44,6 +45,10 @@ const Home = () => {
 
   const userIdChangeHandler = (e) => {
     setUserId(e.target.value);
+  }
+
+  const alarmCreateHandler = () => {
+    createAlarm(7, 50, 'This alarm is from Monologue!');
   }
 
   return (
@@ -65,7 +70,7 @@ const Home = () => {
         <br></br>
         <div id='message-container'>
           {messages.map((message) => (
-            <Message key={message._id.slice(message.length-7)} messageContent={message.messageContent} />
+            <Message key={message._id.slice(message.length-7)} message={message} />
           ))}
         </div>
         <br></br>
@@ -73,8 +78,10 @@ const Home = () => {
           <label>Message:
             <input id='input-message' name='message-input' type='text' placeholder='Send a message' value={message} onChange={messageChangeHandler} ></input>
           </label>
-          <button id='button-send' type='submit' onClick={SendButtonHandler} >Send</button>
+          <button id='button-send' type='submit' onClick={sendButtonHandler} >Send</button>
         </form>
+        <br></br>
+        <button onClick={alarmCreateHandler} >Create an alarm?</button>
       </IonContent>
     </IonPage>
   );
